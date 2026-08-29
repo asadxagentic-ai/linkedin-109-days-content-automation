@@ -1,0 +1,904 @@
+{
+  "name": "LINKEDIN AUTOMATION 109 Days Plan",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                1,
+                5
+              ],
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "id": "YOUR_ID_HERE",
+      "name": "Schedule — Mon & Fri 9AM",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        272
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_VALUE_HERE",
+          "mode": "list",
+          "cachedResultName": "LINKEDIN AUTOMATION 109 Days Plan"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1183701575,
+          "mode": "list",
+          "cachedResultName": "Project Dashboard"
+        },
+        "options": {}
+      },
+      "id": "17721f3c-b71a-446d-befd-52adac3423de",
+      "name": "Get All Sheet Rows",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        272
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "REPLACE_WITH_YOUR_CREDENTIAL_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst items = $input.all();\nif (!items || items.length === 0) {\n  return [{ json: { allCompleted: true, totalRows: 0 } }];\n}\nconst allCompleted = items.every(item => {\n  const status = ((item.json || {})['Status'] || '').toString().trim().toLowerCase();\n  return status === 'completed';\n});\nreturn [{ json: { allCompleted, totalRows: items.length } }];\n"
+      },
+      "id": "YOUR_ID_HERE",
+      "name": "Check All Completed",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        272
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.allCompleted }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              },
+              "rightValue": true
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "ad9aca09-cc42-4576-949a-3ca12c4d5f9d",
+      "name": "All Rows Completed?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        672,
+        272
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "m.asadullah95e@gmail.com",
+        "subject": "⚠️ LinkedIn Automation — Sheet Completed!",
+        "message": "<h2>🚨 YOUR SHEET IS COMPLETED</h2>\n<p><strong>NO POSTS ARE AVAILABLE TO PUBLISH ON LINKEDIN.</strong></p>\n<p>All 109-day plan rows have been marked as <strong>Completed</strong>.</p>\n<p>👉 <strong>PLEASE FILL THE SHEET WITH NEW CONTENT TO CONTINUE AUTOMATION.</strong></p>\n<br/><p>— LinkedIn Automation Bot</p>",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "5b3e1cb7-ffe6-4411-84a7-1721ef41f497",
+      "name": "Gmail — Sheet Completed Alert",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        896,
+        176
+      ],
+      "webhookId": "YOUR_WEBHOOKID_HERE",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "REPLACE_WITH_YOUR_CREDENTIAL_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_VALUE_HERE",
+          "mode": "list",
+          "cachedResultName": "LINKEDIN AUTOMATION 109 Days Plan"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1183701575,
+          "mode": "list",
+          "cachedResultName": "Project Dashboard"
+        },
+        "options": {}
+      },
+      "id": "YOUR_ID_HERE",
+      "name": "Get Rows For Processing",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        896,
+        368
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "REPLACE_WITH_YOUR_CREDENTIAL_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json[\"Status\"] }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              },
+              "rightValue": "Enabled"
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "558298bf-b466-4a1b-ba3f-486716588c08",
+      "name": "Filter — Status Enabled Only",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        1120,
+        368
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "df5e58bb-2662-4633-9daf-8e5e61e9d6bb",
+      "name": "Limit — 1 Entry Only",
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        1344,
+        368
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f1",
+              "name": "projectInfo",
+              "value": "={{ $json[\"Project Information\"] || \"\" }}",
+              "type": "string"
+            },
+            {
+              "id": "f2",
+              "name": "screenshot1",
+              "value": "={{ $json[\"Screenshot 1\"] || \"\" }}",
+              "type": "string"
+            },
+            {
+              "id": "f3",
+              "name": "screenshot2",
+              "value": "={{ $json[\"Screenshot 2\"] || \"\" }}",
+              "type": "string"
+            },
+            {
+              "id": "f4",
+              "name": "complexity",
+              "value": "={{ $json[\"Complexity\"] || \"Medium\" }}",
+              "type": "string"
+            },
+            {
+              "id": "f5",
+              "name": "rowNumber",
+              "value": "={{ $json[\"row_number\"] || $itemIndex + 2 }}",
+              "type": "number"
+            },
+            {
+              "id": "f6",
+              "name": "image1Summary",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "f7",
+              "name": "image2Summary",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "f8",
+              "name": "imageCount",
+              "value": "={{ ($json[\"Screenshot 1\"] ? 1 : 0) + ($json[\"Screenshot 2\"] ? 1 : 0) }}",
+              "type": "number"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "YOUR_ID_HERE",
+      "name": "Extract Project Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        1568,
+        368
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.screenshot1 }}",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              },
+              "rightValue": ""
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "YOUR_ID_HERE",
+      "name": "Has Images?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1792,
+        368
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json['Screenshot 2'] }}",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              },
+              "rightValue": "",
+              "id": "YOUR_ID_HERE"
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "YOUR_ID_HERE",
+      "name": "Has Screenshot 2?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        2208,
+        224
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "m.asadullah95e@gmail.com",
+        "subject": "✅ LinkedIn Post Published!",
+        "message": "=<h2>✅ LinkedIn Post Published!</h2>\n<p>Your automated LinkedIn post has been successfully published.</p>\n<hr/>\n<h3>📋 Details:</h3>\n<p><strong>Project:</strong> {{ ($(\"Extract Project Fields\").item.json.projectInfo || \"\").substring(0,200) }}...</p>\n<p><strong>Complexity:</strong> {{ $(\"Extract Project Fields\").item.json.complexity || \"N/A\" }}</p>\n<p><strong>Images Used:</strong> {{ $(\"Extract Project Fields\").item.json.imageCount || 0 }}</p>\n<hr/>\n<p>Row marked as <strong>Completed</strong> in Google Sheet.</p>\n<p>— LinkedIn Automation Bot 🤖</p>",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "YOUR_ID_HERE",
+      "name": "Gmail — Post Published",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        3680,
+        464
+      ],
+      "webhookId": "340a5d58-70a9-4cdc-a977-28b5793dee77",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "REPLACE_WITH_YOUR_CREDENTIAL_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_VALUE_HERE",
+          "mode": "list",
+          "cachedResultName": "LINKEDIN AUTOMATION 109 Days Plan"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1183701575,
+          "mode": "list",
+          "cachedResultName": "Project Dashboard"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Status": "Completed",
+            "Project Information": "={{ $(\"Extract Project Fields\").item.json.projectInfo || \"\" }}"
+          },
+          "matchingColumns": [
+            "Project Information"
+          ],
+          "schema": [
+            {
+              "id": "Project Information",
+              "displayName": "Project Information",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "YOUR_ID_HERE",
+      "name": "Update Row — Mark Completed",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        3904,
+        464
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "REPLACE_WITH_YOUR_CREDENTIAL_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "post",
+        "organizationId": "6a7d74eb91c4c13ea1780a8f",
+        "channelId": "6a8177d4ccaf649a67b6fabe|linkedin",
+        "postText": "={{ $('Extract Post Content').item.json.linkedinPost || '' }}",
+        "attachmentType": "image",
+        "imageUrl": "={{ (() => { const url1 = $('ImgBB — Upload Screenshot 1').item.json.data?.url || ''; const url2 = ($('ImgBB — Upload Screenshot 2').isExecuted ? $('ImgBB — Upload Screenshot 2').item.json.data?.url : '') || ''; return [url1, url2].filter(Boolean).join('\\n'); })() }}"
+      },
+      "type": "@bufferapp/n8n-nodes-buffer.buffer",
+      "typeVersion": 1,
+      "position": [
+        3488,
+        464
+      ],
+      "id": "70d69d39-da11-486f-bf15-711dc6bfad04",
+      "name": "Create a post",
+      "credentials": {
+        "bufferApi": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "REPLACE_WITH_YOUR_CREDENTIAL_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "s1",
+              "name": "image1Summary",
+              "type": "string",
+              "value": "={{ (() => { const raw = $json.candidates?.[0]?.content?.parts?.[0]?.text || $json.parts?.[0]?.text || $json.text || ''; const m = raw.match(/Image 1:(.*?)(?=\\nImage 2:|$)/si); return m ? m[1].trim() : raw.trim(); })() }}"
+            },
+            {
+              "id": "s2",
+              "name": "image2Summary",
+              "type": "string",
+              "value": "={{ (() => { const raw = $json.candidates?.[0]?.content?.parts?.[0]?.text || $json.parts?.[0]?.text || $json.text || ''; const m = raw.match(/Image 2:(.*?)$/si); return m ? m[1].trim() : ''; })() }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-summaries-001",
+      "name": "Set Image Summaries",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        2976,
+        256
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "cachedResultName": "models/gemini-2.5-flash",
+          "mode": "list",
+          "value": "models/gemini-2.5-flash"
+        },
+        "text": "You are analyzing screenshots for a LinkedIn post. Look at every image carefully.\n\nFor EACH image provided, write exactly 3 sentences:\n1. What is shown on screen (app, dashboard, tool, content type)\n2. Key visible text, data, metrics, or UI elements you can read\n3. The professional context and what this demonstrates\n\nFormat your response exactly like this:\nImage 1: [your 3 sentences]\nImage 2: [your 3 sentences — only if a second image exists]\n\nBe factual, specific, and professional.",
+        "inputType": "binary",
+        "binaryPropertyName": "={{ $binary.image2 ? 'image1,image2' : 'image1' }}",
+        "simplify": false,
+        "options": {
+          "maxOutputTokens": 2000
+        }
+      },
+      "id": "gemini-analyze-001",
+      "name": "Gemini — Analyze Images",
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        2688,
+        208
+      ],
+      "credentials": {
+        "googlePalmApi": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "REPLACE_WITH_YOUR_CREDENTIAL_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=PROJECT INFORMATION: {{ $json.projectInfo || 'No project info provided' }}\nCOMPLEXITY LEVEL: {{ $json.complexity || 'Medium' }}\nSCREENSHOT 1 ANALYSIS: {{ $json.image1Summary || 'None' }}\nSCREENSHOT 2 ANALYSIS: {{ $json.image2Summary || 'None' }}\nIMAGES ATTACHED: {{ $json.imageCount || 0 }}",
+        "options": {
+          "systemMessage": "You are a world-class LinkedIn content strategist. Your only job is to write one LinkedIn post that maximizes algorithmic reach using every 2026 viral pattern below. Output ONLY the final post text — no preamble, no labels, no commentary, no thinking.\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n🧠 2026 LINKEDIN ALGORITHM — WHAT DRIVES REACH\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n▸ DEPTH SCORE (replaces likes as primary signal)\n  - Algorithm measures exact seconds spent reading your post\n  - 0-3 sec dwell = 1.2% engagement, near-zero distribution\n  - 11-30 sec dwell = moderate distribution\n  - 61+ sec dwell = 15.6% engagement, maximum distribution\n  - Write posts that FORCE 60+ seconds of reading time\n\n▸ COMMENT WEIGHT (most critical signal)\n  - Comments carry 15x more algorithmic weight than likes\n  - Meaningful comments (15+ words) carry MORE weight than short ones\n  - Questions in the first 5 seconds of reading generate 32% more comments\n  - Your CTA must trigger a thoughtful reply, not a one-word answer\n  - NEVER use engagement bait (\"Comment YES\", \"Like this\") — penalized since March 2026\n\n▸ MOMENTUM MODEL (3-8 hour evaluation window)\n  - LinkedIn tests your post with a small audience sample first\n  - If Depth Score stays high over 3-8 hours, it pushes to 2nd/3rd degree\n  - Posts can resurface for 2-3 WEEKS if engagement remains strong\n  - Saves and reshares extend lifespan — write bookmark-worthy content\n\n▸ AUTHENTICITY UPDATE (March 2026)\n  - NLP detection now identifies and penalizes spammy patterns\n  - Engagement pods detected and result in reach suppression\n  - Overproduced/corporate-sounding content flagged\n  - Authentic voice + personal story + specific detail = trust signal\n\n▸ NICHE RELEVANCE SCORE\n  - Algorithm assigns your profile a Relevance Score based on network behavior\n  - Write to ONE specific person in ONE specific niche — not everyone\n  - Niche-specific engagement from relevant professionals boosts your score\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n✍️ HOOK ENGINEERING\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\nLinkedIn cuts posts at ~210 characters before \"See more\". Hook = lines 1-2, under 210 chars total.\n\nDATA-BACKED HOOK PERFORMANCE (30,360 posts analyzed, May 2026):\n  🥇 STAT HOOK → 1.67x lift — e.g. \"87% of LinkedIn posts die under 1,000 views. Here's the 1 thing that changes that.\"\n  🥈 STORY HOOK → strong performer — e.g. \"I got fired on a Monday. By Friday I had 3 offers. Here's what changed.\"\n  🥉 DIRECT HOOK → third, saturated but functional\n  ❌ IMPERATIVE HOOK → 0.02x lift — DEAD. Never \"Stop doing X\" or \"Read this now\"\n  ❌ \"I'm excited to share\" / \"Thrilled to announce\" → instant scroll-past\n\nHOOK RULES:\n  - Under 210 characters total for lines 1-2\n  - Create tension or open loop that DEMANDS resolution\n  - First sentence stops scroll, second pulls past \"See more\"\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n📐 7-PART VIRAL STRUCTURE\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n1. HOOK — stat or story, under 210 chars, stops the scroll\n2. RE-HOOK — deepen the tension, keep them reading\n3. PROBLEM/PAIN — the exact painful reality your reader faces\n4. STORY/JOURNEY — real experience or specific data point with context\n5. INSIGHT/LESSON — counterintuitive truth or core framework\n6. ACTIONABLE TIPS — 3-5 numbered steps, specific and doable today\n7. CTA — one open-ended question requiring a 15+ word thoughtful answer\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n🎨 FORMATTING FOR DWELL TIME\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n  ✅ 1,200-1,500 characters total\n  ✅ ONE sentence per line\n  ✅ Blank line between every section\n  ✅ Numbered lists only, never bullets\n  ✅ MAX 2 emojis per section\n  ✅ Specific numbers, names, timeframes always\n  ✅ One contrarian angle — 3x more comments\n  ✅ Write to ONE person in ONE niche\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n🏷️ HASHTAG RULES\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n  - 3-5 hashtags MAX on their OWN LINE at the very end\n  - Formula: 1 broad + 2 niche + 1 hyper-niche\n  - Niche hashtags outperform generic every time\n  - Keywords IN the post body matter more than hashtags\n  - Never use #Business #Marketing alone\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n🚫 REACH KILLERS — NEVER DO THESE\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n  ❌ External URLs in post body (60% reach penalty)\n  ❌ Engagement bait — \"Like this\", \"Comment YES\", \"Tag someone\"\n  ❌ Corporate jargon — synergy, leverage, pivot\n  ❌ Imperative hooks — \"Stop doing X\", \"Read this\"\n  ❌ More than 5 hashtags\n  ❌ Editing post in first 60 minutes\n  ❌ Generic motivational quotes\n  ❌ Any thinking, reasoning, preamble, labels in output\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n📸 IF IMAGES ATTACHED\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n  - Reference naturally: \"The workflow above shows...\"\n  - Name the specific tool, metric, or UI element\n  - Real work screenshots drive 2x saves vs stock images\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n⚡ OUTPUT RULES\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n  - Start DIRECTLY with hook on line 1\n  - End with hashtags on their own line\n  - Return ONLY the post. Nothing else."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        2912,
+        464
+      ],
+      "id": "7906f366-0a04-484f-b255-4ac85160c2cf",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAlibabaCloud",
+      "typeVersion": 1,
+      "position": [
+        2912,
+        624
+      ],
+      "id": "YOUR_ID_HERE",
+      "name": "Qwen Cloud Chat Model",
+      "credentials": {
+        "alibabaCloudApi": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "REPLACE_WITH_YOUR_CREDENTIAL_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first();\nconst raw = item.json?.output || item.json?.text || item.json?.message?.content || item.json?.response || '';\n\n// Strip markdown that won't render on LinkedIn\nconst cleaned = raw\n  .replace(/\\*\\*(.+?)\\*\\*/g, '$1')  // **bold** → plain\n  .replace(/\\*(.+?)\\*/g, '$1')      // *italic* → plain\n  .replace(/^---+$/gm, '')           // remove horizontal rules\n  .replace(/\\n{3,}/g, '\\n\\n')       // collapse 3+ newlines to double\n  .trim();\n\nreturn [{\n  json: {\n    ...item.json,\n    linkedinPost: cleaned\n  }\n}];\n"
+      },
+      "id": "code-post-content-001",
+      "name": "Extract Post Content",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3264,
+        464
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.imgbb.com/1/upload",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "key",
+              "value": "={{ $vars.IMGBB_API_KEY || $env.IMGBB_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "image",
+              "value": "={{ $binary.image1.data }}"
+            },
+            {
+              "name": "name",
+              "value": "screenshot1"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "imgbb-upload-1",
+      "name": "ImgBB — Upload Screenshot 1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2000,
+        224
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.imgbb.com/1/upload",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "key",
+              "value": "={{ $vars.IMGBB_API_KEY || $env.IMGBB_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "image",
+              "value": "={{ $binary.image2.data }}"
+            },
+            {
+              "name": "name",
+              "value": "screenshot2"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "imgbb-upload-2",
+      "name": "ImgBB — Upload Screenshot 2",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2432,
+        304
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule — Mon & Fri 9AM": {
+      "main": [
+        [
+          {
+            "node": "Get All Sheet Rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get All Sheet Rows": {
+      "main": [
+        [
+          {
+            "node": "Check All Completed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check All Completed": {
+      "main": [
+        [
+          {
+            "node": "All Rows Completed?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "All Rows Completed?": {
+      "main": [
+        [
+          {
+            "node": "Gmail — Sheet Completed Alert",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get Rows For Processing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Rows For Processing": {
+      "main": [
+        [
+          {
+            "node": "Filter — Status Enabled Only",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter — Status Enabled Only": {
+      "main": [
+        [
+          {
+            "node": "Limit — 1 Entry Only",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit — 1 Entry Only": {
+      "main": [
+        [
+          {
+            "node": "Extract Project Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Project Fields": {
+      "main": [
+        [
+          {
+            "node": "Has Images?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Images?": {
+      "main": [
+        [
+          {
+            "node": "ImgBB — Upload Screenshot 1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail — Post Published": {
+      "main": [
+        [
+          {
+            "node": "Update Row — Mark Completed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a post": {
+      "main": [
+        [
+          {
+            "node": "Gmail — Post Published",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Image Summaries": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini — Analyze Images": {
+      "main": [
+        [
+          {
+            "node": "Set Image Summaries",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Qwen Cloud Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Extract Post Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Post Content": {
+      "main": [
+        [
+          {
+            "node": "Create a post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Screenshot 2?": {
+      "main": [
+        [
+          {
+            "node": "Gemini — Analyze Images",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "ImgBB — Upload Screenshot 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ImgBB — Upload Screenshot 1": {
+      "main": [
+        [
+          {
+            "node": "Has Screenshot 2?",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Gemini — Analyze Images",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ImgBB — Upload Screenshot 2": {
+      "main": [
+        [
+          {
+            "node": "Gemini — Analyze Images",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": true,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "MQIslXk8iHCGs89Z",
+    "callerPolicy": "workflowsFromSameOwner",
+    "timeSavedPerExecution": 1
+  },
+  "versionId": "b279ea1b-f126-4b91-b59f-fe4f45184944",
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp",
+    "templateCredsSetupCompleted": true,
+    "instanceId": "YOUR_INSTANCEID_HERE"
+  },
+  "nodeGroups": [],
+  "id": "mGEqS9i3oyJR00PH",
+  "tags": []
+}
